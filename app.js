@@ -1,15 +1,15 @@
 var budgetController = (function () {
     
     // Constructor to construct an object for an expense
-    var Expense = function (type, description, amount) {
-        this.type = type;
+    var Expense = function (id, description, amount) {
+        this.id = id;
         this.description = description;
         this.amount = amount;
     }
     
     // Constructor to construct an object foe an income
-    var Income = function (type, description, amount) {
-        this.type = type;
+    var Income = function (id, description, amount) {
+        this.id = id;
         this.description = description;
         this.amount = amount;
     }
@@ -38,28 +38,37 @@ var budgetController = (function () {
             var newItem, ID;
             
             // ID will be the total number of items
-            ID = (incomeData.arrayOfIncome.length + expenseData.arrayOfExpense.length); 
+            ID = (incomeData.arrayOfIncome.length + expenseData.arrayOfExpense.length) + 1; 
             
             if (type == "inc") {
                 // Create a new item for income
-                newItem = new Income(type, description, amount);
-                
-                console.log('New item added');
+                newItem = new Income(ID, description, amount);
                 
                 // Add that item to the array of incomes
                 incomeData.arrayOfIncome.push(newItem);
                 
+                // Add the value to the total income so that the total amount is updated
+                incomeData.totalIncome += Number(amount);
+                
             } else if (type == "exp") {
                 // Create a new item for expense
-                newItem = new Expense(type, description, amount);
+                newItem = new Expense(ID, description, amount);
                 
                 // Add that item to the array of expense
                 expenseData.arrayOfExpense.push(newItem);
+                
+                // Add the value to the total expense so that the total amount is updated
+                expenseData.totalExpense += Number(amount);
             }
+            
+            // Return a new item that just has been created
+            return newItem;
         },
         
-        showIncomeItem: function () {
-            return incomeData.arrayOfIncome.length;
+        testing: function () {
+            console.log(incomeData);
+
+            console.log(expenseData);
         }
     }
     
@@ -81,6 +90,26 @@ var UIController = (function () {
         // Function to return the value of the input
         getUserInputValue: function () {
             return document.querySelector(".add__value").value;
+        },
+        
+        addListItem: function (obj, type) {
+            
+            // HTML string to be added and replaced
+            var htmlString, newHTML;
+            
+            // Replace the HTML string with text from placeholder
+            
+            // The fields in the HTML string that are going to be replaced including: id, description, value, percentage
+            
+            if (type == 'inc') {
+                // HTML string for the income
+                htmlString = '<div class="item clearfix" id="expense-%id%"><div class="item__description">%description%</div><div class="right clearfix"><div class="item__value">%value%</div><div class="item__percentage">21%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>';
+            } else if (type == 'exp') {
+                // HTML string for the expense
+                htmlString = '<div class="item clearfix" id="expense-%id%"><div class="item__description">%description%</div><div class="right clearfix"><div class="item__value">%value%</div><div class="item__percentage">10%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>';
+            }
+            
+            // Replace the text of placeholder with actual data
         }
     };
     
@@ -98,9 +127,7 @@ var controller = (function (budgetCtrl, UICtrl) {
         console.log(UICtrl.getUserInputValue());
         
         // Add item to budget controller
-        budgetCtrl.addItem(UICtrl.getUserInputType, UICtrl.getUserInputDescription, UICtrl.getUserInputValue);
-        
-        console.log(budgetCtrl.showIncomeItem());
+        budgetCtrl.addItem(UICtrl.getUserInputType(), UICtrl.getUserInputDescription(), UICtrl.getUserInputValue());
         
         // Add item to the UI
         
@@ -111,6 +138,9 @@ var controller = (function (budgetCtrl, UICtrl) {
     
     // Function to set up event listener
     var setupEventListener = function () {
+        
+        console.log('Event listener has been set ');
+        
         // Set up the event so that when the add button is clicked, the input from the user will be read
         document.querySelector(".add__btn").addEventListener('click', addFunction);
 

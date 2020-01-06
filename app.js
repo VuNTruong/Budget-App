@@ -33,6 +33,8 @@ var budgetController = (function () {
     }
     
     return {
+        
+        // Function which will be used to add new item to the array of data structures and return the newly created object
         addItem: function (type, description, amount) {
             
             var newItem, ID;
@@ -103,13 +105,31 @@ var UIController = (function () {
             
             if (type == 'inc') {
                 // HTML string for the income
-                htmlString = '<div class="item clearfix" id="expense-%id%"><div class="item__description">%description%</div><div class="right clearfix"><div class="item__value">%value%</div><div class="item__percentage">21%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>';
+                htmlString = '<div class="item clearfix" id="income-%id%"><div class="item__description">%description%</div><div class="right clearfix"><div class="item__value">%value%</div><div class="item__percentage">21%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>';
             } else if (type == 'exp') {
                 // HTML string for the expense
-                htmlString = '<div class="item clearfix" id="expense-%id%"><div class="item__description">%description%</div><div class="right clearfix"><div class="item__value">%value%</div><div class="item__percentage">10%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>';
+                htmlString = '<div class="item clearfix" id="expense-%id%"><div class="item__description">%description%</div><div class="right clearfix"><div class="item__value>%value%</div><div class="item__percentage">21%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>';
             }
             
             // Replace the text of placeholder with actual data
+            newHTML = htmlString.replace('%id%', obj.id);
+            
+            // Override the newHTML, not the current HTML
+            newHTML = newHTML.replace('%description%', obj.description);
+            
+            // Override the newHTML, not the current HTML
+            newHTML = newHTML.replace('%value%', obj.amount);
+            
+            // Insert the new HTML string which contains updated information into the HTML file so that the new item will be displayed on the list
+            
+            // If the type of the item is expense, insert the new HTML as a child of the expenses__list class
+            if (type == 'exp') {
+                document.querySelector('.expenses__list').insertAdjacentHTML('beforeend', newHTML);
+            }   
+            // If the type of the item is income, insert the new HTML as a child of the income__list class
+            else if (type == 'inc') {
+                document.querySelector('.income__list').insertAdjacentHTML('beforeend', newHTML);
+            }
         }
     };
     
@@ -119,6 +139,10 @@ var controller = (function (budgetCtrl, UICtrl) {
     
     // Function to be executed when either add button is clicked or enter key is pressed
     var addFunction = function () {
+        
+        // Newly created object
+        var newItem;
+        
         // Get the input from the user
         console.log(UICtrl.getUserInputType());
         
@@ -127,9 +151,14 @@ var controller = (function (budgetCtrl, UICtrl) {
         console.log(UICtrl.getUserInputValue());
         
         // Add item to budget controller
-        budgetCtrl.addItem(UICtrl.getUserInputType(), UICtrl.getUserInputDescription(), UICtrl.getUserInputValue());
+        newItem = budgetCtrl.addItem(UICtrl.getUserInputType(), UICtrl.getUserInputDescription(), UICtrl.getUserInputValue());
         
         // Add item to the UI
+        UICtrl.addListItem({
+            id: newItem.id,
+            amount: newItem.amount,
+            description: newItem.description
+        }, UICtrl.getUserInputType());
         
         // Calculate the budget
         

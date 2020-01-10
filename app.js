@@ -5,14 +5,14 @@ var budgetController = (function () {
         this.id = id;
         this.description = description;
         this.amount = amount;
-    }
+    };
     
     // Constructor to construct an object foe an income
     var Income = function (id, description, amount) {
         this.id = id;
         this.description = description;
         this.amount = amount;
-    }
+    };
     
     // Object to hold data for total income
     var incomeData = {
@@ -21,7 +21,7 @@ var budgetController = (function () {
         
         // Variable to hold the total income
         totalIncome : 0
-    }
+    };
     
     // Object to hold data for total expense
     var expenseData = {
@@ -30,7 +30,7 @@ var budgetController = (function () {
     
         // Variable to hold the total expense
         totalExpense : 0
-    }
+    };
     
     return {
         
@@ -76,7 +76,7 @@ var budgetController = (function () {
         getTotalExpense: function () {
             return Number(expenseData.totalExpense);
         }
-    }
+    };
     
 })();
 
@@ -212,6 +212,21 @@ var UIController = (function () {
 })();
 
 var controller = (function (budgetCtrl, UICtrl) {
+        
+    // Function to set up current date and time
+    var setupDateAndTime = function () {
+        // Call the function to set up current date and time
+        var d = new Date();
+
+        UICtrl.updateCurrentDateAndTime((d.getMonth() + 1) + "/" + d.getDate() + "/" + d.getFullYear());
+
+        // Ask the user to enter the available budget for the current day
+        //document.querySelector('.budget__value').textContent = Number(prompt('Enter the available budget for today'));
+        document.querySelector('.budget__value').textContent = Number(3000);
+
+        // Reset the current income and expense
+        UICtrl.resetIncomeAndExpense();
+    }
     
     // Function to be executed when either add button is clicked or enter key is pressed to add item to the list and display on the UI
     var addFunction = function () {
@@ -250,55 +265,46 @@ var controller = (function (budgetCtrl, UICtrl) {
         
         // Clear the field
         UICtrl.clearField();
-    }
+    };
     
     // Function which will be called to remove item from the list
     var deleteController = function (event) {
-        console.log(event.target);   
+        console.log(event.target.parentNode);   
         console.log('Clicked');
-    }
+    };
     
     // Function to set up event listener
     var setupEventListener = function () {
-        
-        // Set up the event so that when the add button is clicked, the input from the user will be read
+        // Set up the event so that when the add button is clicked, the input from the user will be read and new item will be added to the UI
         document.querySelector(".add__btn").addEventListener('click', addFunction);
+
+        // Set up event so that when the user can delete item from the UI
+        document.querySelector(".container").addEventListener('click', deleteController);
 
         // Set up the event so that when the enter key is pressed, the input from the user will be read
         document.addEventListener('keypress', function(event) {
             if (event.keyCode == 13) {
 
+                // Call the add function in order to able to add the item into the UI
                 addFunction();
 
             }
         });
-        
-        // Function which will be used to delete item from the list
-        document.querySelector('.container').addEventListener('click', deleteController);
     }
     
-    // Return the object that will call the function which will be use to initialize the app
     return {
-        initialize: function () {
+        initialize : function () {
             
-            // Call the function to set up event listener when the app starts
+            // Call the function to set up date and time
+            setupDateAndTime();
+            
+            // Call the function to set up event listener
             setupEventListener();
             
-            // Call the function to set up current date and time
-            var d = new Date();
-            
-            UICtrl.updateCurrentDateAndTime((d.getMonth() + 1) + "/" + d.getDate() + "/" + d.getFullYear());
-            
-            // Ask the user to enter the available budget for the current day
-            //document.querySelector('.budget__value').textContent = Number(prompt('Enter the available budget for today'));
-            document.querySelector('.budget__value').textContent = Number(3000);
-            
-            // Reset the current income and expense
-            UICtrl.resetIncomeAndExpense();
         }
-    }
+    };
     
 })(budgetController, UIController);
 
-// Call the initialize function to initialize the app
+// Call the initialize function of the controller to initialize the app
 controller.initialize();

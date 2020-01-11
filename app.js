@@ -1,4 +1,194 @@
-var budgetController = (function () {
+var UIController = (function () {
+      
+    var removeItemInfo = {
+        itemType: "",
+        amount: 0
+    };
+    
+    return {
+        // Function to return the type of the input
+        getUserInputType: function () {
+            return document.querySelector(".add__type").value;
+        },
+    
+        // Function to return the description of the input
+        getUserInputDescription: function () {
+            return document.querySelector(".add__description").value;
+        },
+        
+        // Function to return the value of the input
+        getUserInputValue: function () {
+            return document.querySelector(".add__value").value;
+        },
+        
+        // Function to set the type of the item to be removed
+        setRemoveItemType: function (itemType) {
+            removeItemInfo.itemType = itemType;
+        },
+        
+        // Function to set the amount of the item to be removed
+        setRemoveItemAmount: function (itemAmount) {
+            removeItemInfo.amount = Number(itemAmount);    
+        },
+        
+        // Function to return the type of the item to be removed
+        getRemoveItemType: function () {
+            return removeItemInfo.itemType; 
+        },
+        
+        // Function to return the amount of the item to be removed
+        getRemoveItemAmount: function () {
+            return removeItemInfo.amount;
+        },
+        
+        // Function which will be used to add item to the UI
+        addListItem: function (obj, type) {
+            
+            // HTML string to be added and replaced
+            var htmlString, newHTML;
+            
+            // Replace the HTML string with text from placeholder
+            
+            // The fields in the HTML string that are going to be replaced including: id, description, value, percentage
+            
+            if (type == 'inc') {
+                // HTML string for the income
+                htmlString = '<div class="item clearfix" id="income-%id%"><div class="item__description">%description%</div><div class="right clearfix"><div class="item__value">%value%</div><div class="item__percentage">21%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>';
+            } else if (type == 'exp') {
+                // HTML string for the expense
+                htmlString = '<div class="item clearfix" id="expense-%id%"><div class="item__description">%description%</div><div class="right clearfix"><div class="item__value>%value%</div><div class="item__percentage">21%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>';
+            }
+            
+            // Replace the text of placeholder with actual data
+            newHTML = htmlString.replace('%id%', obj.id);
+            
+            // Override the newHTML, not the current HTML
+            newHTML = newHTML.replace('%description%', obj.description);
+            
+            // Override the newHTML, not the current HTML
+            newHTML = newHTML.replace('%value%', obj.amount);
+            
+            // Insert the new HTML string which contains updated information into the HTML file so that the new item will be displayed on the list
+            
+            // If the type of the item is expense, insert the new HTML as a child of the expenses__list class
+            if (type == 'exp') {
+                document.querySelector('.expenses__list').insertAdjacentHTML('beforeend', newHTML);
+            }   
+            // If the type of the item is income, insert the new HTML as a child of the income__list class
+            else if (type == 'inc') {
+                document.querySelector('.income__list').insertAdjacentHTML('beforeend', newHTML);
+            }
+        },
+        
+        // Function which will be used to remove item from the UI
+        removeListItem: function (itemID) {
+            
+            // Reference to the object whose id is itemID which has been passed to the method
+            var elementToDelete = document.getElementById(itemID);
+            
+            // Reference to the parent element of the element to remove and remove that element from the parent node
+            elementToDelete.parentNode.removeChild(elementToDelete);
+            
+        },
+        
+        // This function will be called after each time a new item is added in order to remove the component of the previous input
+        clearField: function () {
+            
+            // This one is used to hold the list of input values
+            var fields;
+            
+            // This one is used to hold the array of input values
+            var fieldArray;
+            
+            fields = document.querySelectorAll('.add__description' + ', ' + '.add__value');
+            
+            // Convert that field into an array and store it into the fieldArray
+            fieldArray = Array.prototype.slice.call(fields);
+            
+            fieldArray.forEach(function(curent, index, array) {
+                curent.value = "";
+            });
+        },
+        
+        // Function which will be used to update the total income
+        updateTotalIncome: function (totalIncome) {
+            // Get the total income element of the HTML and set it to the current total income value
+            document.querySelector('.budget__income--value').textContent = totalIncome;
+        },
+        
+        // Function which will be used to update the total expense
+        updateTotalExpense: function (totalExpense) {
+            // Get the total expense element of the HLTM and set it to the current total expense value
+            document.querySelector('.budget__expenses--value').textContent = totalExpense;
+        },
+        
+        // Function which will be used to update the current date and time
+        updateCurrentDateAndTime: function (currentDateAndTime) {
+            // Replace the part of the HTML file which will help with displaying date and time
+            document.body.innerHTML = document.body.innerHTML.replace('<span class="budget__title--month">%Month%</span>', '<span class="budget__title--month">' + currentDateAndTime + '</span>');
+        },
+        
+        // Function which will be used to reset the current income and expense to 0 when initializing the app
+        resetIncomeAndExpense: function () {
+            
+            // Set the current income to 0 and display it on the UI
+            document.querySelector('.budget__income--value').textContent = Number(0);
+            
+            // Set the current expense to 0 and display it to the UI
+            document.querySelector('.budget__expenses--value').textContent = Number(0);
+        },
+        
+        // Function which will be used to update the current budget for item that has been added
+        updateBudget: function (inputType, inputValue) {
+            
+            // Variable to store the calculated budget which will also be returned later
+            var calculatedBudget = 0;
+            
+            // Get the current total budget from the UI
+            var totalBudget = Number(document.querySelector('.budget__value').textContent);
+            
+            // Calculate the budget
+            if (inputType == 'inc') {
+                calculatedBudget = totalBudget + Number(inputValue);
+            } else if (inputType == 'exp') {
+                calculatedBudget = totalBudget - Number(inputValue);
+            }
+            
+            // Display the calculated budget
+            document.querySelector('.budget__value').textContent = calculatedBudget;
+            
+            // Return the calculated budget
+            return calculatedBudget;
+        },
+        
+        // Function which will be used to update the current budget for item that has been removed
+        updateBudgetRemove: function (inputType, inputValue) {
+            
+            // Variable to store the calculated budget which will also be returned later
+            var calculatedBudget = 0;
+            
+            // Get the current total budget from the UI
+            var totalBudget = Number(document.querySelector('.budget__value').textContent);
+            
+            // Calculate the budget
+            if (inputType == 'inc') {
+                calculatedBudget = totalBudget - Number(inputValue);
+            } else if (inputType == 'exp') {
+                calculatedBudget = totalBudget + Number(inputValue);
+            }
+            
+            // Display the calculated budget
+            document.querySelector('.budget__value').textContent = calculatedBudget;
+            
+            // Return the calculated budget
+            return calculatedBudget;
+        }
+    
+    };
+    
+})();
+
+var budgetController = (function (UICtrl) {
     
     // Constructor to construct an object for an expense
     var Expense = function (id, description, amount) {
@@ -67,6 +257,70 @@ var budgetController = (function () {
             return newItem;
         },
         
+        // Function which will be called to delete an existing item from the data structure
+        deleteItem: function (type, id) {
+            
+            // Get the index of item based on the id provided
+            
+            // If the type of the item is income, get the object from the array for the income objects. Must convert the id parameter passed to the method into number in order to be able to compare
+            if (type == 'income') {                
+                for (var i = 0; i < incomeData.arrayOfIncome.length; i++) {
+                    if (incomeData.arrayOfIncome[i].id == Number(id)) {
+                    
+                        // Once the item is found, save that item into the variable
+                        var arrayItemToRemove = incomeData.arrayOfIncome[i];
+                        
+                        // Set the type of the item to be removed to income
+                        UICtrl.setRemoveItemType('inc');
+                        
+                        // Set the amount of the item to be remove
+                        UICtrl.setRemoveItemAmount(arrayItemToRemove.amount);
+                        
+                        // Substract the amount of the income item that has been remove from the budget
+                        incomeData.totalIncome -= Number(arrayItemToRemove.amount);
+                        
+                        // Remove that item away from the data structure
+                        incomeData.arrayOfIncome.splice(incomeData.arrayOfIncome.indexOf(arrayItemToRemove), 1);
+
+                    }
+                }
+            }
+            // If the type of the item is expense, get the object from the array of the expense objects. Must also convert the id parameter passed to the method into number in order to be able to compare
+            else if (type == 'expense') {
+                
+                for (var i = 0; i < expenseData.arrayOfExpense.length; i++) {
+                    if (expenseData.arrayOfExpense[i].id == Number(id)) {
+                        
+                        // Once the item is found, save that item into the variable
+                        var arrayItemToRemove = expenseData.arrayOfExpense[i];
+                        
+                        // Set the type of the item to be remove to expense
+                        UICtrl.setRemoveItemType('exp');
+                        
+                        // Set the amount of the item to be removed
+                        UICtrl.setRemoveItemAmount(arrayItemToRemove.amount);
+                    
+                        // Substract the amount of the expense item that has been remove from the budget
+                        expenseData.totalExpense -= Number(arrayItemToRemove.amount);
+                        
+                        // Remove that item away from the data structure
+                        expenseData.arrayOfExpense.splice(expenseData.arrayOfExpense.indexOf(arrayItemToRemove), 1);
+                        
+                    }
+                }
+            }
+            
+        },
+        
+        // Functions for testing
+        testIncome: function () {
+            return incomeData.arrayOfIncome;
+        },
+        
+        testExpense: function () {
+            return expenseData.arrayOfExpense;
+        },
+        
         // Function which will be used to get the total income
         getTotalIncome: function () {
             return Number(incomeData.totalIncome);
@@ -78,138 +332,7 @@ var budgetController = (function () {
         }
     };
     
-})();
-
-var UIController = (function () {
-             
-    return {
-        // Function to return the type of the input
-        getUserInputType: function () {
-            return document.querySelector(".add__type").value;
-        },
-    
-        // Function to return the description of the input
-        getUserInputDescription: function () {
-            return document.querySelector(".add__description").value;
-        },
-        
-        // Function to return the value of the input
-        getUserInputValue: function () {
-            return document.querySelector(".add__value").value;
-        },
-        
-        // Function which will be used to add item to the UI
-        addListItem: function (obj, type) {
-            
-            // HTML string to be added and replaced
-            var htmlString, newHTML;
-            
-            // Replace the HTML string with text from placeholder
-            
-            // The fields in the HTML string that are going to be replaced including: id, description, value, percentage
-            
-            if (type == 'inc') {
-                // HTML string for the income
-                htmlString = '<div class="item clearfix" id="income-%id%"><div class="item__description">%description%</div><div class="right clearfix"><div class="item__value">%value%</div><div class="item__percentage">21%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>';
-            } else if (type == 'exp') {
-                // HTML string for the expense
-                htmlString = '<div class="item clearfix" id="expense-%id%"><div class="item__description">%description%</div><div class="right clearfix"><div class="item__value>%value%</div><div class="item__percentage">21%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>';
-            }
-            
-            // Replace the text of placeholder with actual data
-            newHTML = htmlString.replace('%id%', obj.id);
-            
-            // Override the newHTML, not the current HTML
-            newHTML = newHTML.replace('%description%', obj.description);
-            
-            // Override the newHTML, not the current HTML
-            newHTML = newHTML.replace('%value%', obj.amount);
-            
-            // Insert the new HTML string which contains updated information into the HTML file so that the new item will be displayed on the list
-            
-            // If the type of the item is expense, insert the new HTML as a child of the expenses__list class
-            if (type == 'exp') {
-                document.querySelector('.expenses__list').insertAdjacentHTML('beforeend', newHTML);
-            }   
-            // If the type of the item is income, insert the new HTML as a child of the income__list class
-            else if (type == 'inc') {
-                document.querySelector('.income__list').insertAdjacentHTML('beforeend', newHTML);
-            }
-        },
-        
-        // This function will be called after each time a new item is added in order to remove the component of the previous input
-        clearField: function () {
-            
-            // This one is used to hold the list of input values
-            var fields;
-            
-            // Thí one is used to hold the array of input values
-            var fieldArray;
-            
-            fields = document.querySelectorAll('.add__description' + ', ' + '.add__value');
-            
-            // Convert that field into an array and store it into the fieldArray
-            fieldArray = Array.prototype.slice.call(fields);
-            
-            fieldArray.forEach(function(curent, index, array) {
-                curent.value = "";
-            });
-        },
-        
-        // Function which will be used to update the total income
-        updateTotalIncome: function (totalIncome) {
-            // Get the total income element of the HTML and set it to the current total income value
-            document.querySelector('.budget__income--value').textContent = totalIncome;
-        },
-        
-        // Function which will be used to update the total expense
-        updateTotalExpense: function (totalExpense) {
-            // Get the total expense element of the HLTM and set it to the current total expense value
-            document.querySelector('.budget__expenses--value').textContent = totalExpense;
-        },
-        
-        // Function which will be used to update the current date and time
-        updateCurrentDateAndTime: function (currentDateAndTime) {
-            // Replace the part of the HTML file which will help with displaying date and time
-            document.body.innerHTML = document.body.innerHTML.replace('<span class="budget__title--month">%Month%</span>', '<span class="budget__title--month">' + currentDateAndTime + '</span>')
-        },
-        
-        // Function which will be used to reset the current income and expense to 0 when initializing the app
-        resetIncomeAndExpense: function () {
-            
-            // Set the current income to 0 and display it on the UI
-            document.querySelector('.budget__income--value').textContent = Number(0);
-            
-            // Set the current expense to 0 and display it to the UI
-            document.querySelector('.budget__expenses--value').textContent = Number(0);
-        },
-        
-        // Function which will be used to update the current budget
-        updateBudget: function (inputType, inputValue) {
-            
-            // Variable to store the calculated budget which will also be returned later
-            var calculatedBudget = 0;
-            
-            // Get the current total budget from the UI
-            var totalBudget = Number(document.querySelector('.budget__value').textContent);
-            
-            // Calculate the budget
-            if (inputType == 'inc') {
-                calculatedBudget = totalBudget + Number(inputValue);
-            } else if (inputType == 'exp') {
-                calculatedBudget = totalBudget - Number(inputValue);
-            }
-            
-            // Display the calculated budget
-            document.querySelector('.budget__value').textContent = calculatedBudget;
-            
-            // Return the calculated budget
-            return calculatedBudget;
-        },
-    
-    };
-    
-})();
+})(UIController);
 
 var controller = (function (budgetCtrl, UICtrl) {
         
@@ -269,8 +392,55 @@ var controller = (function (budgetCtrl, UICtrl) {
     
     // Function which will be called to remove item from the list
     var deleteController = function (event) {
-        console.log(event.target.parentNode);   
-        console.log('Clicked');
+       
+        // Variable to hold the id of the item want to delete from the UI (this is in the form of income-1) 
+        var itemID;
+        
+        // Array of 2 elements to hold the type of the item and the id of it
+        var splitID;
+        
+        // Variable to hold the type of the item on the UI
+        var itemType;
+        
+        // Variable to hold the numeric id of the element
+        var numericID;
+        
+        // Get the parent component of the element. In order to delete the whole item from the UI, we need to reference to the parent node of the item. (<div class="item clearfix" id="income-0">) and get rid of that in order to get rid of the whole thing. 
+        // All we need to know about the element is its ID, becuase it will help with referencing the right element
+        itemID = event.target.parentNode.parentNode.parentNode.parentNode.id;   
+        
+        // If the element clicked has an id (it is either an income or expense item), then delete that element
+        if (itemID) {
+            
+            // Split the itemID which has the form like (income-1 into a string that contains type and number so that it will be easier to find out which list to remove from)
+            splitID = itemID.split('-');
+            
+            // Set the item type. This will be the first element of the splitID array 
+            itemType = splitID[0];
+
+            // Set the numeric id. This will be the second element of the splitID array
+            numericID = splitID[1];
+            
+            // Delete item from the income list
+            budgetCtrl.deleteItem(itemType, numericID);
+            
+            // Delete that item from the UI
+            UICtrl.removeListItem(itemID);
+            
+            // Update the budget
+            // Calculate the budget by calling the update total income and update total expense method from the UIController object
+            // Update the total expense and display it
+            UICtrl.updateTotalExpense(budgetCtrl.getTotalExpense());
+
+            // Update the total income and display it
+            UICtrl.updateTotalIncome(budgetCtrl.getTotalIncome());
+
+            // Update the total budget and display it
+            UICtrl.updateBudgetRemove(UICtrl.getRemoveItemType(), UICtrl.getRemoveItemAmount());
+            
+            //console.log(event.target.parentNode.parentNode.parentNode.parentNode);
+            
+        }
     };
     
     // Function to set up event listener

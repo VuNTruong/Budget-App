@@ -140,8 +140,8 @@ var UIController = (function () {
         
         // Function which will be used to update the current date and time
         updateCurrentDateAndTime: function (currentDateAndTime) {
-            // Replace the part of the HTML file which will help with displaying date and time
-            document.body.innerHTML = document.body.innerHTML.replace('<span class="budget__title--month">%Month%</span>', '<span class="budget__title--month">' + currentDateAndTime + '</span>');
+            // Replace the part of the HTML file which will help with displaying date and time by accessing its textContent  
+            document.querySelector('budget__title--month').textContent = currentDateAndTime;
         },
         
         // Function which will be used to reset the current income and expense to 0 when initializing the app

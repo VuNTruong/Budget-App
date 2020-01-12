@@ -124,6 +124,9 @@ var UIController = (function () {
             fieldArray.forEach(function(curent, index, array) {
                 curent.value = "";
             });
+            
+            // Do this so that when item is entered, the cursor will go back to item description box
+            fieldArray[0].focus();
         },
         
         // Function which will be used to update the total income
@@ -141,7 +144,7 @@ var UIController = (function () {
         // Function which will be used to update the current date and time
         updateCurrentDateAndTime: function (currentDateAndTime) {
             // Replace the part of the HTML file which will help with displaying date and time by accessing its textContent  
-            document.querySelector('budget__title--month').textContent = currentDateAndTime;
+            document.querySelector('.budget__title--month').textContent = currentDateAndTime;
         },
         
         // Function which will be used to reset the current income and expense to 0 when initializing the app
@@ -202,13 +205,34 @@ var UIController = (function () {
         
         // Function to update the current percentage for the total income
         updateIncomePercentage: function (percentage) {
-            document.querySelector('.budget__income--percentage').textContent = percentage + "%";
+            
+            // If the percentage passed into this function is NaN (No item in the income list and expense list), then set the percentage to 0 
+            if (isNaN(percentage)) {
+                document.querySelector('.budget__income--percentage').textContent = "0%";
+            } else {
+                document.querySelector('.budget__income--percentage').textContent = percentage + "%";
+            }
         },
         
         // Function to update the current percentage for the total expense
         updateExpensePercentage: function (percentage) {
-            document.querySelector('.budget__expenses--percentage').textContent = percentage + "%";
+            
+            // If the percentage passed into this function is NaN (No item in the income list and expense list), then set the percetage to 0
+            if (isNaN(percentage)) {
+                document.querySelector('.budget__expenses--percentage').textContent = "0%";
+            } else {
+                document.querySelector('.budget__expenses--percentage').textContent = percentage + "%";
+            }
         },
+        
+        // Function to reset the percentage of both income and expense back to 0
+        resetIncomeAndExpensePercentage: function () {
+            // Reset the percentage of income back to 0
+            document.querySelector('.budget__income--percentage').textContent = "0%";
+            
+            // Reset the percentage of income back to 0
+            document.querySelector('.budget__expenses--percentage').textContent = "0%";
+        }
     
     };
     
@@ -440,11 +464,13 @@ var controller = (function (budgetCtrl, UICtrl) {
         UICtrl.updateCurrentDateAndTime((d.getMonth() + 1) + "/" + d.getDate() + "/" + d.getFullYear());
 
         // Ask the user to enter the available budget for the current day
-        //document.querySelector('.budget__value').textContent = Number(prompt('Enter the available budget for today'));
-        document.querySelector('.budget__value').textContent = Number(3000);
+        document.querySelector('.budget__value').textContent = Number(prompt('Enter the available budget for today'));
 
         // Reset the current income and expense
         UICtrl.resetIncomeAndExpense();
+        
+        // Reset the percentage for income and expense
+        UICtrl.resetIncomeAndExpensePercentage();
     }
     
     // Function to be executed when either add button is clicked or enter key is pressed to add item to the list and display on the UI

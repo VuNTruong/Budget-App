@@ -53,22 +53,24 @@ var UIController = (function () {
             
             if (type == 'inc') {
                 // HTML string for the income
-                htmlString = '<div class="item clearfix" id="income-%id%"><div class="item__description">%description%</div><div class="right clearfix"><div class="item__value">%value%</div><div class="item__percentage">21%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>';
+                htmlString = '<div class="item clearfix" id="income-%id%"><div class="item__description">%description%</div><div class="right clearfix"><div class="item__value">%value%</div><div class="item__percentage">20%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>';
             } else if (type == 'exp') {
                 // HTML string for the expense
-                htmlString = '<div class="item clearfix" id="expense-%id%"><div class="item__description">%description%</div><div class="right clearfix"><div class="item__value>%value%</div><div class="item__percentage">21%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>';
+                htmlString = '<div class="item clearfix" id="expense-%id%"><div class="item__description">%description%</div><div class="right clearfix"><div class="item__value">%value%</div><div class="item__percentage">20%</div><div class="item__delete"><button class="item__delete--btn"><i class="ion-ios-close-outline"></i></button></div></div></div>';
             }
             
-            // Replace the text of placeholder with actual data
+            // Replace the text of placeholder with actual data. Update the ID first
             newHTML = htmlString.replace('%id%', obj.id);
             
-            // Override the newHTML, not the current HTML
+            // Override the newHTML, not the current HTML. This step is used to update the description
             newHTML = newHTML.replace('%description%', obj.description);
             
-            // Override the newHTML, not the current HTML
+            // Override the newHTML, not the current HTML. This step is used to update the value
             newHTML = newHTML.replace('%value%', obj.amount);
             
             // Insert the new HTML string which contains updated information into the HTML file so that the new item will be displayed on the list
+            
+            console.log(newHTML);
             
             // If the type of the item is expense, insert the new HTML as a child of the expenses__list class
             if (type == 'exp') {
@@ -78,6 +80,20 @@ var UIController = (function () {
             else if (type == 'inc') {
                 document.querySelector('.income__list').insertAdjacentHTML('beforeend', newHTML);
             }
+        },
+        
+        // Function to modify the percentage of the currently existed items when the item is added
+        modifyPercentage: function (id, percentage) {
+            
+            // Multiply the percentage with 100 
+            var multipliedPercentage = percentage * 100;
+            
+            // Reference to the child element where the percentage is displayed and replace its text componenent with the updated percentage
+            
+            console.log(id);
+            
+            document.getElementById(id).childNodes[1].childNodes[1].textContent = multipliedPercentage + "%";
+            
         },
         
         // Function which will be used to remove item from the UI
@@ -191,17 +207,59 @@ var UIController = (function () {
 var budgetController = (function (UICtrl) {
     
     // Constructor to construct an object for an expense
-    var Expense = function (id, description, amount) {
+    var Expense = function (id, description, amount, percentage) {
         this.id = id;
         this.description = description;
         this.amount = amount;
+        this.percentage = percentage;
+        
+        this.getID = function () {
+            return this.id;
+        };
+        
+        this.getDescription = function () {
+            return this.description;
+        };
+        
+        this.getAmount = function () {
+            return this.amount;
+        };
+        
+        this.getPercentage = function () {
+            return this.percentage;  
+        };
+        
+        this.getType = function () {
+            return 'exp';
+        }
     };
     
     // Constructor to construct an object foe an income
-    var Income = function (id, description, amount) {
+    var Income = function (id, description, amount, percentage) {
         this.id = id;
         this.description = description;
         this.amount = amount;
+        this.percentage = percentage;
+        
+        this.getID = function () {
+            return this.id;
+        };
+        
+        this.getDescription = function () {
+            return this.description;
+        };
+        
+        this.getAmount = function () {
+            return this.amount;
+        };
+        
+        this.getPercentage = function () {
+            return this.percentage;  
+        };
+        
+        this.getType = function () {
+            return 'inc';  
+        };
     };
     
     // Object to hold data for total income
@@ -225,7 +283,7 @@ var budgetController = (function (UICtrl) {
     return {
         
         // Function which will be used to add new item to the array of data structures and return the newly created object
-        addItem: function (type, description, amount) {
+        addItem: function (type, description, amount, percentage) {
             
             var newItem, ID;
             
@@ -234,7 +292,7 @@ var budgetController = (function (UICtrl) {
             
             if (type == "inc") {
                 // Create a new item for income
-                newItem = new Income(ID, description, amount);
+                newItem = new Income(ID, description, amount, percentage);
                 
                 // Add that item to the array of incomes
                 incomeData.arrayOfIncome.push(newItem);
@@ -244,7 +302,7 @@ var budgetController = (function (UICtrl) {
                 
             } else if (type == "exp") {
                 // Create a new item for expense
-                newItem = new Expense(ID, description, amount);
+                newItem = new Expense(ID, description, amount, percentage);
                 
                 // Add that item to the array of expense
                 expenseData.arrayOfExpense.push(newItem);
@@ -312,12 +370,13 @@ var budgetController = (function (UICtrl) {
             
         },
         
-        // Functions for testing
-        testIncome: function () {
+        // Function to return an array of incomes
+        getArrayOfIncome: function () {
             return incomeData.arrayOfIncome;
         },
         
-        testExpense: function () {
+        // Function to return an array of expenses
+        getArrayOfExpense: function () {
             return expenseData.arrayOfExpense;
         },
         
@@ -329,6 +388,33 @@ var budgetController = (function (UICtrl) {
         // Function which will be used to get the total expense
         getTotalExpense: function () {
             return Number(expenseData.totalExpense);
+        },
+        
+        // Function to return the array of amount for income
+        getArrayOfAmountIncome: function () {
+            return incomeData.arrayOfIncome;
+        },
+        
+        // Function to return the array of amount for expense
+        getArrayOfAmountExpense: function () {
+            return expenseData.arrayOfExpense;
+        },
+        
+        // Function to update the percentage of existing items when new item is added. The function will reference to the item by using its type and id.
+        updateCurrentItemPercentage (type, id, newPercentage) {
+            if (type == 'inc') {
+                for (var i = 0; i < incomeData.arrayOfIncome.length; i++) {
+                    if (incomeData.arrayOfIncome[i].id == Number(id)) {
+                        incomeData.arrayOfIncome[i].percentage = newPercentage;
+                    }
+                }
+            } else if (type == 'exp') {
+                for (var i = 0; i < expenseData.arrayOfExpense.length; i++) {
+                    if (expenseData.arrayOfExpense[i].id == Number(id)) {
+                        expenseData.arrayOfExpense[i].percentage = newPercentage;
+                    }
+                }
+            }
         }
     };
     
@@ -366,14 +452,26 @@ var controller = (function (budgetCtrl, UICtrl) {
             return;
         }
         
+        // Calculate the percentage of the newly added item
+        var newlyAddedPercentage = 0;
+        
+        if (UICtrl.getUserInputType() == 'inc') {
+            newlyAddedPercentage = (Number(UICtrl.getUserInputValue()) / (Number(budgetCtrl.getTotalIncome()) + Number(UICtrl.getUserInputValue()))) * 100;
+            //console.log(Number(budgetCtrl.getTotalIncome()) + Number(UICtrl.getUserInputValue()));
+            console.log(UICtrl.getUserInputValue());
+        } else if (UICtrl.getUserInputType() == 'exp') {
+            newlyAddedPercentage = (Number(UICtrl.getUserInputValue()) / (Number(budgetCtrl.getTotalExpense()) + Number(UICtrl.getUserInputValue()))) * 100;
+        }
+        
         // Add item to budget controller
-        newItem = budgetCtrl.addItem(UICtrl.getUserInputType(), UICtrl.getUserInputDescription(), UICtrl.getUserInputValue());
+        newItem = budgetCtrl.addItem(UICtrl.getUserInputType(), UICtrl.getUserInputDescription(), UICtrl.getUserInputValue(), newlyAddedPercentage);
         
         // Add item to the UI
         UICtrl.addListItem({
             id: newItem.id,
             amount: newItem.amount,
-            description: newItem.description
+            description: newItem.description,
+            percentage: newItem.percentage
         }, UICtrl.getUserInputType());
         
         // Calculate the budget by calling the update total income and update total expense method from the UIController object
@@ -386,13 +484,40 @@ var controller = (function (budgetCtrl, UICtrl) {
         // Update the total budget and display it
         UICtrl.updateBudget(UICtrl.getUserInputType(), UICtrl.getUserInputValue());
         
+        // Update the percentage of the current items
+        // Get the array of currently existed income items and store in an array
+        var arrayOfAmountIncome = budgetCtrl.getArrayOfAmountIncome();
+        
+        // Update the percentages for the incomes
+        // Round the raw percentage (percentage which hasn't been updated by multiplication with 100) to the nearesst 4 decimal places so that it won't look ugly when they are displayed
+        for (var i = 0; i < budgetCtrl.getArrayOfIncome().length; i++) {
+            budgetCtrl.updateCurrentItemPercentage(budgetCtrl.getArrayOfIncome()[i].getType(), budgetCtrl.getArrayOfIncome()[i].getID(), ((Number(budgetCtrl.getArrayOfIncome()[i].getAmount()) / Number(budgetCtrl.getTotalIncome())).toFixed(4)));
+            
+            // Update the percentage to display on the UI
+            UICtrl.modifyPercentage('income-' + budgetCtrl.getArrayOfIncome()[i].getID(), budgetCtrl.getArrayOfIncome()[i].getPercentage());
+        }
+        
+        // Get the array of currently existed expense items and store in an array
+        var arrayOfAmountExpense = budgetCtrl.getArrayOfAmountExpense();
+        
+        // Update the percentages for the expenses
+        // Round the raw percentage (percentage which hasn't been updated by multiplication with 100) to the nearest 4 decimal places so that it won't look ugly when they are displayed
+        for (var i = 0; i < budgetCtrl.getArrayOfExpense().length; i++) {
+            budgetCtrl.updateCurrentItemPercentage(budgetCtrl.getArrayOfExpense()[i].getType(), budgetCtrl.getArrayOfExpense()[i].getID(), ((Number(budgetCtrl.getArrayOfExpense()[i].getAmount()) / Number(budgetCtrl.getTotalExpense())).toFixed(4)));
+            
+            // Update the percentages to display on the UI
+            UICtrl.modifyPercentage('expense-' + budgetCtrl.getArrayOfExpense()[i].getID(), budgetCtrl.getArrayOfExpense()[i].getPercentage());
+        }
+        
+        console.log(budgetCtrl.getArrayOfExpense()[0].getAmount());
+        
         // Clear the field
         UICtrl.clearField();
     };
     
     // Function which will be called to remove item from the list
     var deleteController = function (event) {
-       
+        
         // Variable to hold the id of the item want to delete from the UI (this is in the form of income-1) 
         var itemID;
         
@@ -447,7 +572,7 @@ var controller = (function (budgetCtrl, UICtrl) {
     var setupEventListener = function () {
         // Set up the event so that when the add button is clicked, the input from the user will be read and new item will be added to the UI
         document.querySelector(".add__btn").addEventListener('click', addFunction);
-
+        
         // Set up event so that when the user can delete item from the UI
         document.querySelector(".container").addEventListener('click', deleteController);
 

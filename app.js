@@ -563,8 +563,26 @@ var controller = (function (budgetCtrl, UICtrl) {
             // Update the total budget and display it
             UICtrl.updateBudgetRemove(UICtrl.getRemoveItemType(), UICtrl.getRemoveItemAmount());
             
-            //console.log(event.target.parentNode.parentNode.parentNode.parentNode);
-            
+            // Update the percentage of the current items
+            // Round the raw percentage (percentage which hasn't been updated by multiplication with 100) to the nearesst 4 decimal places so that it won't look ugly when they are displayed
+            for (var i = 0; i < budgetCtrl.getArrayOfIncome().length; i++) {
+                budgetCtrl.updateCurrentItemPercentage(budgetCtrl.getArrayOfIncome()[i].getType(), budgetCtrl.getArrayOfIncome()[i].getID(), ((Number(budgetCtrl.getArrayOfIncome()[i].getAmount()) / Number(budgetCtrl.getTotalIncome())).toFixed(4)));
+
+                // Update the percentage to display on the UI
+                UICtrl.modifyPercentage('income-' + budgetCtrl.getArrayOfIncome()[i].getID(), budgetCtrl.getArrayOfIncome()[i].getPercentage());
+            }
+
+            // Get the array of currently existed expense items and store in an array
+            var arrayOfAmountExpense = budgetCtrl.getArrayOfAmountExpense();
+
+            // Update the percentages for the expenses
+            // Round the raw percentage (percentage which hasn't been updated by multiplication with 100) to the nearest 4 decimal places so that it won't look ugly when they are displayed
+            for (var i = 0; i < budgetCtrl.getArrayOfExpense().length; i++) {
+                budgetCtrl.updateCurrentItemPercentage(budgetCtrl.getArrayOfExpense()[i].getType(), budgetCtrl.getArrayOfExpense()[i].getID(), ((Number(budgetCtrl.getArrayOfExpense()[i].getAmount()) / Number(budgetCtrl.getTotalExpense())).toFixed(4)));
+
+                // Update the percentages to display on the UI
+                UICtrl.modifyPercentage('expense-' + budgetCtrl.getArrayOfExpense()[i].getID(), budgetCtrl.getArrayOfExpense()[i].getPercentage());
+            }   
         }
     };
     

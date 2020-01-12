@@ -198,7 +198,17 @@ var UIController = (function () {
             
             // Return the calculated budget
             return calculatedBudget;
-        }
+        }, 
+        
+        // Function to update the current percentage for the total income
+        updateIncomePercentage: function (percentage) {
+            document.querySelector('.budget__income--percentage').textContent = percentage + "%";
+        },
+        
+        // Function to update the current percentage for the total expense
+        updateExpensePercentage: function (percentage) {
+            document.querySelector('.budget__expenses--percentage').textContent = percentage + "%";
+        },
     
     };
     
@@ -509,7 +519,12 @@ var controller = (function (budgetCtrl, UICtrl) {
             UICtrl.modifyPercentage('expense-' + budgetCtrl.getArrayOfExpense()[i].getID(), budgetCtrl.getArrayOfExpense()[i].getPercentage());
         }
         
-        console.log(budgetCtrl.getArrayOfExpense()[0].getAmount());
+        // Get the current total of expense and income
+        
+        // Calculate the percentage and call the function from UI Controller to display it on the UI
+        UICtrl.updateIncomePercentage((Number(budgetCtrl.getTotalIncome()) / (Number(budgetCtrl.getTotalIncome()) + Number(budgetCtrl.getTotalExpense()))).toFixed(4) * 100);
+        
+        UICtrl.updateExpensePercentage((Number(budgetCtrl.getTotalExpense()) / (Number(budgetCtrl.getTotalIncome()) + Number(budgetCtrl.getTotalExpense()))).toFixed(4) * 100);
         
         // Clear the field
         UICtrl.clearField();
@@ -582,7 +597,12 @@ var controller = (function (budgetCtrl, UICtrl) {
 
                 // Update the percentages to display on the UI
                 UICtrl.modifyPercentage('expense-' + budgetCtrl.getArrayOfExpense()[i].getID(), budgetCtrl.getArrayOfExpense()[i].getPercentage());
-            }   
+            }
+            
+            // Calculate the percentage and call the function from UI Controller to display it on the UI
+            UICtrl.updateIncomePercentage((Number(budgetCtrl.getTotalIncome()) / (Number(budgetCtrl.getTotalIncome()) + Number(budgetCtrl.getTotalExpense()))).toFixed(4) * 100);
+
+            UICtrl.updateExpensePercentage((Number(budgetCtrl.getTotalExpense()) / (Number(budgetCtrl.getTotalIncome()) + Number(budgetCtrl.getTotalExpense()))).toFixed(4) * 100);
         }
     };
     
